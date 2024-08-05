@@ -2,6 +2,8 @@
 
 // Do not change code below this line
 // This code will just display the questions to the screen
+
+
 const questions = [
   {
     question: "What is the capital of France?",
@@ -30,32 +32,39 @@ const questions = [
   },
 ];
 
-// Display the quiz questions and choices
+// Render the quiz questions and choices
 function renderQuestions() {
   const questionsElement = document.getElementById("questions");
   questionsElement.innerHTML = ""; // Clear previous content
 
   questions.forEach((question, i) => {
     const questionElement = document.createElement("div");
-    const questionText = document.createTextNode(question.question);
+    questionElement.classList.add("question");
+
+    const questionText = document.createElement("p");
+    questionText.textContent = question.question;
     questionElement.appendChild(questionText);
-    
+
     question.choices.forEach(choice => {
-      const choiceElement = document.createElement("input");
-      choiceElement.setAttribute("type", "radio");
-      choiceElement.setAttribute("name", `question-${i}`);
-      choiceElement.setAttribute("value", choice);
+      const choiceContainer = document.createElement("div");
+
+      const choiceInput = document.createElement("input");
+      choiceInput.type = "radio";
+      choiceInput.name = `question-${i}`;
+      choiceInput.value = choice;
 
       // Restore saved answers if any
       const savedAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
       if (savedAnswers[`question-${i}`] === choice) {
-        choiceElement.checked = true;
+        choiceInput.checked = true;
       }
 
-      const choiceText = document.createTextNode(choice);
-      questionElement.appendChild(choiceElement);
-      questionElement.appendChild(choiceText);
-      questionElement.appendChild(document.createElement("br")); // Add line break for better readability
+      const choiceLabel = document.createElement("label");
+      choiceLabel.textContent = choice;
+      choiceLabel.insertBefore(choiceInput, choiceLabel.firstChild); // Place checkbox before text
+
+      choiceContainer.appendChild(choiceLabel);
+      questionElement.appendChild(choiceContainer);
     });
 
     questionsElement.appendChild(questionElement);
@@ -98,13 +107,14 @@ function displayScore(score) {
 }
 
 // Handle submit button click
-document.getElementById("submit").addEventListener("click", () => {
+function handleSubmit() {
   saveProgress();
   const score = calculateScore();
   displayScore(score);
-});
+}
 
 // Initialize the quiz on page load
 window.addEventListener("load", () => {
   renderQuestions();
+  document.getElementById("submit").addEventListener("click", handleSubmit);
 });
