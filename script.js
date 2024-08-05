@@ -32,25 +32,79 @@ const questions = [
 
 // Display the quiz questions and choices
 function renderQuestions() {
-  for (let i = 0; i < questions.length; i++) {
-    const question = questions[i];
+  const questionsElement = document.getElementById("questions");
+  questionsElement.innerHTML = ""; // Clear previous content
+
+  questions.forEach((question, i) => {
     const questionElement = document.createElement("div");
     const questionText = document.createTextNode(question.question);
     questionElement.appendChild(questionText);
-    for (let j = 0; j < question.choices.length; j++) {
-      const choice = question.choices[j];
+    
+    question.choices.forEach(choice => {
       const choiceElement = document.createElement("input");
       choiceElement.setAttribute("type", "radio");
       choiceElement.setAttribute("name", `question-${i}`);
       choiceElement.setAttribute("value", choice);
-      if (userAnswers[i] === choice) {
-        choiceElement.setAttribute("checked", true);
+
+      // Restore saved answers if any
+      const savedAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
+      if (savedAnswers[`question-${i}`] === choice) {
+        choiceElement.checked = true;
       }
+
       const choiceText = document.createTextNode(choice);
       questionElement.appendChild(choiceElement);
       questionElement.appendChild(choiceText);
-    }
+      questionElement.appendChild(document.createElement("br")); // Add line break for better readability
+    });
+
     questionsElement.appendChild(questionElement);
-  }
+  });
 }
-renderQuestions();
+
+// Save progress to session storage
+function saveProgress() {
+  const savedAnswers = {};
+  questions.forEach((_, i) => {
+    const selectedOption = document.querySelector(`input[name="question-${i}"]:checked`);
+    if (selectedOption) {
+      savedAnswers[`question-${i}`] = selectedOption.value;
+    }
+  });
+  sessionStorage.setItem("progress", JSON.stringify(savedAnswers));
+}
+
+// Calculate the score
+function calculateScore() {
+  const savedAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
+  let score = 0;
+
+  questions.forEach((question, i) => {
+    if (savedAnswers[`question-${i}`] === question.answer) {
+      score++;
+    }
+  });
+
+  return score;
+}
+
+// Display the score
+function displayScore(score) {
+  const scoreElement = document.getElementById("score");
+  scoreElement.textContent = `Your score is ${score} out of ${questions.length}.`;
+
+  // Save score to local storage
+  localStorage.setItem("score", score);
+}
+
+// Handle submit button click
+document.getElementById("submit").addEventListener("click", () => {
+  saveProgress();
+  const score = calculateScore();
+  displayScore(score);
+});
+
+// Initialize the quiz on page load
+window.addEventListener("load", () => {
+  renderQuestions();
+});
