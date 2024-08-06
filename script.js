@@ -1,9 +1,3 @@
-//your JS code here.
-
-// Do not change code below this line
-// This code will just display the questions to the screen
-
-
 const questions = [
   {
     question: "What is the capital of France?",
@@ -32,7 +26,6 @@ const questions = [
   },
 ];
 
-// Render the quiz questions and choices
 function renderQuestions() {
   const questionsElement = document.getElementById("questions");
   questionsElement.innerHTML = ""; // Clear previous content
@@ -71,7 +64,6 @@ function renderQuestions() {
   });
 }
 
-// Save progress to session storage
 function saveProgress() {
   const savedAnswers = {};
   questions.forEach((_, i) => {
@@ -83,7 +75,6 @@ function saveProgress() {
   sessionStorage.setItem("progress", JSON.stringify(savedAnswers));
 }
 
-// Calculate the score
 function calculateScore() {
   const savedAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
   let score = 0;
@@ -97,7 +88,6 @@ function calculateScore() {
   return score;
 }
 
-// Display the score
 function displayScore(score) {
   const scoreElement = document.getElementById("score");
   scoreElement.textContent = `Your score is ${score} out of ${questions.length}.`;
@@ -106,14 +96,12 @@ function displayScore(score) {
   localStorage.setItem("score", score);
 }
 
-// Handle submit button click
 function handleSubmit() {
   saveProgress();
   const score = calculateScore();
   displayScore(score);
 }
 
-// Initialize the quiz on page load
 window.addEventListener("load", () => {
   renderQuestions();
   document.getElementById("submit").addEventListener("click", handleSubmit);
